@@ -5,21 +5,40 @@ var globalJson = '{'+
                         '"KugelnProStange": 10,'+
                         '"KugelRadius": 50,'+
                         '"KugelSpacing": 5,'+
-                        '"StangenSpacing": 30,'+
+                        '"StangenSpacing": 5,'+
                         '"RahmenThickness":10,'+ 
                         '"StangenThickness":2,'+
-                        '"StangenColor":"#FFFFAA"'+
+                        '"StangenColor":"#000000"'+
                   '}';
 
 class Kugel
 {   constructor(pos)
     {
+        this.settings = JSON.parse(globalJson);
         this.flippedRight = true;
         this.pos = pos;
     }
 
-    draw()
+    draw(X,Y)
     {
+        var radius = this.settings["KugelRadius"];
+        var spacing = this.settings["KugelSpacing"];
+        var posY = Y - (radius/2);
+        var posX = X + (this.pos * (spacing + radius));
+        var kugelColor = "#FF0000";
+
+        var kugel = document.createElement("div");
+        kugel.style = "" +
+        "background-color:" + kugelColor + "; " + 
+        "z-index: 1; " +
+        "position: absolute; " +
+        "width:" + radius + "px; " +
+        "height:" + radius + "px; " +
+        "top:" + posY + "px; " +
+        "left:" + posX + "px; "+
+        "border-radius:" + radius + "px; ";
+        
+        document.body.appendChild(kugel);
 
     }
 }
@@ -66,17 +85,26 @@ class Stange
         var rahmenThickness = this.settings["RahmenThickness"];
         var stangenThickness = this.settings["StangenThickness"];
         var stangenColor = this.settings["StangenColor"];
-        var stangenLength = 2*this.kugelnProStange * (kugelRadius + kugelSpacing);
-        var posY = Y + this.pos * stangenSpacing;
+        var stangenLength = 2 * (this.kugelnProStange * (kugelRadius + kugelSpacing));
+        var posY = Y + this.pos * (stangenSpacing + kugelRadius);
         var posX = rahmenThickness + X;
         var stange = document.createElement("div");
+        //Problematisch beim Warten des Codes, eventuell bessere Lösung überlegen.
         stange.style = "" +
                     "background-color:" + stangenColor + "; " + 
+                    "z-index: 0; " +
+                    "position: absolute; " +
                     "width:" + stangenLength + "px; " +
-                    "height" + stangenThickness + "px; " +
+                    "height:" + stangenThickness + "px; " +
                     "top:" + posY + "px; " +
                     "left:" + posX + "px; ";
         document.body.appendChild(stange);
+
+        //Kugeln drawn
+        for(var i = 0; i < this.kugelnProStange; i++)
+        {
+            this.kugeln[i].draw(posX,posY);
+        }
 
     }
 }
@@ -122,6 +150,9 @@ class Abakus
 
 }
 
-var abakus = new Abakus();
-abakus.draw();
-console.log(abakus.gesammtWert);
+function main()
+{
+    var abakus = new Abakus();
+    abakus.draw(200,200);
+    console.log(abakus.gesammtWert);
+}
