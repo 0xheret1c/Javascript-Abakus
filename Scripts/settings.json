@@ -1,4 +1,4 @@
 {
-    "Stangen": 5,
-    "KugelnProStange": 10,
+    "Stangen": 5,                   //Anzahl der Stangen des Abakus.
+    "KugelnProStange": 10,          //Anzahl der Kugeln pro Stange.
 }

@@ -17,7 +17,7 @@ class Stange
         this.wert = Math.pow(10,posY)   // Die erste Stange bildet die 1er stellen, 
                                         // also 10^0, die zweite Stange die 10er Stellen also  10^1. etc..
         
-        this.kugeln = new Array();
+        this.kugeln = new Array();      
         for(var i = 0; i < this.kugelnProStange; i++)
         {
             this.kugeln[i] = new Kugel(this.wert,i);
@@ -64,5 +64,10 @@ class Abakus
             value = value + stangen[i].value;
         }
         return value;
+    }
+
+    drawAbakus()
+    {
+
     }
 }
