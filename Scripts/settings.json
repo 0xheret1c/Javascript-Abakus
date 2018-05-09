@@ -1,4 +1,8 @@
 {
     "Stangen": 5,                   //Anzahl der Stangen des Abakus.
     "KugelnProStange": 10,          //Anzahl der Kugeln pro Stange.
+    
+    "KugelRadius": "50px",          //Größe der Kugeln
+    "KugelSpacing": "5px",          //Abstand der Kugeln zueinander auf der Stange
+    "StangenSpacing": "30px",       //Abstand der Stangen zueinander.
 }
