@@ -1,41 +1,83 @@
+
+//Mit json datei ersetzen, wenn wir wissen wie
+var globalJson = '{'+
+                        '"Stangen": 5,'+
+                        '"KugelnProStange": 10,'+
+                        '"KugelRadius": 50,'+
+                        '"KugelSpacing": 5,'+
+                        '"StangenSpacing": 30,'+
+                        '"RahmenThickness":10,'+ 
+                        '"StangenThickness":2,'+
+                        '"StangenColor":"#FFFFAA"'+
+                  '}';
+
 class Kugel
-{   constructor(posX)
+{   constructor(pos)
     {
-        this.flippedRight = false;
-        this.posX = posX;
+        this.flippedRight = true;
+        this.pos = pos;
+    }
+
+    draw()
+    {
+
     }
 }
 
 class Stange
 {
-    constructor(posY)
+    constructor(pos)
     {
-        this.settings = JSON.parse("settings.json");
-        this.kugelnProStange = settings["KugelnProStange"];
-        this.posY = posY;
-        this.wert = Math.pow(10,posY)   // Die erste Stange bildet die 1er stellen, 
+
+        this.settings = JSON.parse(globalJson);
+        this.kugelnProStange = this.settings['KugelnProStange'];
+
+        this.pos = pos;                 //Die Position im Array
+        this.wert = Math.pow(10,pos)    // Die erste Stange bildet die 1er stellen, 
                                         // also 10^0, die zweite Stange die 10er Stellen also  10^1. etc..
         
         this.kugeln = new Array();      
         for(var i = 0; i < this.kugelnProStange; i++)
         {
-            this.kugeln[i] = new Kugel(this.wert,i);
+            this.kugeln[i] = new Kugel(i);
         }
     }
 
-    //"value()" gibt den Gesammtwert der Stange zurück, das heißt den Wert aller 
+    //"gesammtWert()" gibt den Gesammtwert der Stange zurück, das heißt den Wert aller 
     //Kugeln die nach rechts geschoben worden sind.
-    get value()
+    get  gesammtWert()
     {
-        var value = 0;
+        var wert = 0;
         for(var i = 0; i < this.kugelnProStange; i++)
         {
             if(this.kugeln[i].flippedRight)
             {
-                value = value + this.wert;
+                wert = wert + this.wert;
             }
         }
-        return value;
+        return wert;
+    }
+
+    draw(X,Y)
+    {
+        var kugelRadius = this.settings["KugelRadius"];
+        var kugelSpacing = this.settings["KugelSpacing"];
+        var stangenSpacing = this.settings["StangenSpacing"];
+        var rahmenThickness = this.settings["RahmenThickness"];
+        var stangenThickness = this.settings["StangenThickness"];
+        var stangenColor = this.settings["StangenColor"];
+        var stangenLength = 2*this.kugelnProStange * (kugelRadius + kugelSpacing);
+        var posY = Y + this.pos * stangenSpacing;
+        var posX = rahmenThickness + X;
+        var stange = document.createElement("div");
+        stange.style = "" +
+                    "background-color:" + stangenColor + "; " + 
+                    "width:" + stangenLength + "px; " +
+                    "height" + stangenThickness + "px; " +
+                    "top:" + posY + "px; " +
+                    "left:" + posX + "px; ";
+        document.body.appendChild(stange);
+
     }
 }
 
@@ -43,8 +85,10 @@ class Abakus
 {
     constructor()
     {
-        this.settings = JSON.parse("settings.json");
-        this.anzahlStangen = settings["Stangen"];
+        //json parsen
+        this.settings = JSON.parse(globalJson);
+
+        this.anzahlStangen = this.settings['Stangen'];
         this.stangen = new Array();
         this.value = 0;
         for(var i = 0; i < this.anzahlStangen; i++)
@@ -53,17 +97,31 @@ class Abakus
         }
     }
 
-    //"value()" gibt den Gesammtwert des Abakus zurück, das heißt den Wert aller 
+    //"gesammtWert()" gibt den Gesammtwert des Abakus zurück, das heißt den Wert aller 
     //Gesammtwerte der Stangen.
-    get value()
+    get gesammtWert()
     {
-        var value = 0;
+        var wert = 0;
         for(var i = 0; i < this.anzahlStangen; i++)
         {
-            value = value + stangen[i].value;
+            wert =  wert + this.stangen[i].gesammtWert;
         }
-        return value;
+        return  wert;
     }
+
+    draw(X,Y)
+    {
+        //Stangen drawen
+        for(var i = 0; i < this.anzahlStangen; i++)
+        {
+            this.stangen[i].draw(X,Y);
+        }
+
+        //Rahmen drawen
+    }
+
 }
 
 var abakus = new Abakus();
+abakus.draw();
+console.log(abakus.gesammtWert);
