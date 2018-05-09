@@ -1,6 +1,5 @@
 class Kugel
-{
-    constructor(posX)
+{   constructor(posX)
     {
         this.flippedRight = false;
         this.posX = posX;
@@ -65,9 +64,6 @@ class Abakus
         }
         return value;
     }
-
-    drawAbakus()
-    {
-
-    }
 }
+
+var abakus = new Abakus();
