@@ -12,8 +12,9 @@ var globalJson = '{'+
                   '}';
 
 class Kugel
-{   constructor(pos)
+{   constructor(pos,id)
     {
+        this.id = id;
         this.settings = JSON.parse(globalJson);
         this.flippedRight = true;
         this.pos = pos;
@@ -28,6 +29,8 @@ class Kugel
         var kugelColor = "#FF0000";
 
         var kugel = document.createElement("div");
+        
+        kugel.id = this.id;
         kugel.style = "" +
         "background-color:" + kugelColor + "; " + 
         "z-index: 1; " +
@@ -37,7 +40,12 @@ class Kugel
         "top:" + posY + "px; " +
         "left:" + posX + "px; "+
         "border-radius:" + radius + "px; ";
-        
+        console.log(this.id);
+        kugel.addEventListener('click',function()
+        {
+            moveKugel(this.id);
+        });
+
         document.body.appendChild(kugel);
 
     }
@@ -56,9 +64,9 @@ class Stange
                                         // also 10^0, die zweite Stange die 10er Stellen also  10^1. etc..
         
         this.kugeln = new Array();      
-        for(var i = 0; i < this.kugelnProStange; i++)
+        for(var i = this.kugelnProStange; i >= 0; i--)
         {
-            this.kugeln[i] = new Kugel(i);
+            this.kugeln[i] = new Kugel(i,""+pos+"-"+i);
         }
     }
 
@@ -119,7 +127,7 @@ class Abakus
         this.anzahlStangen = this.settings['Stangen'];
         this.stangen = new Array();
         this.value = 0;
-        for(var i = 0; i < this.anzahlStangen; i++)
+        for(var i = this.anzahlStangen -1; i >=0; i--)
         {
             this.stangen[i] = new Stange(i);
         }
@@ -148,6 +156,12 @@ class Abakus
         //Rahmen drawen
     }
 
+}
+
+function moveKugel(x)
+{
+    var kugel = document.getElementById(x);
+    console.log(kugel.id);
 }
 
 function main()
