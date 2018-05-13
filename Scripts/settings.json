@@ -6,5 +6,6 @@
     "StangenSpacing": 30,
     "RahmenThickness":10,
     "StangenThickness":2,
+    "TransitionSpeed": 1,
     "StangenColor":"#FFFFAA"
 }

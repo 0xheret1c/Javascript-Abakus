@@ -8,38 +8,95 @@ var globalJson = '{'+
                         '"StangenSpacing": 5,'+
                         '"RahmenThickness":10,'+ 
                         '"StangenThickness":2,'+
+                        '"TransitionSpeed": 1,'+
                         '"StangenColor":"#000000"'+
                   '}';
 
+
+
 class Kugel
-{   constructor(pos,id)
+{   constructor(pos,id,wert,stange)
     {
+        this.stange = stange;
+        this.wert = wert;
         this.id = id;
         this.settings = JSON.parse(globalJson);
-        this.flippedRight = true;
-        this.pos = pos;
+        this.flippedRight = false;
+        this.pos = pos;     //position in array
+        this.posX = undefined; // X posigion on abakus
+        this.X = undefined; //X position on page
+        this.Y = undefined; //Y position on page
+        this.spacing = this.settings["KugelSpacing"];
+        this.radius = this.settings["KugelRadius"];
+        this.spacing = this.settings["KugelSpacing"];
+        this.tSpeed = this.settings["TransitionSpeed"];
+        this.kugelnProStange = this.settings["KugelnProStange"];
+        this.posY = undefined;
+        this.posX = undefined;
+        this.kugelColor = "#FF0000";
     }
 
-    draw(X,Y)
+    flip()
     {
-        var radius = this.settings["KugelRadius"];
-        var spacing = this.settings["KugelSpacing"];
-        var posY = Y - (radius/2);
-        var posX = X + (this.pos * (spacing + radius));
-        var kugelColor = "#FF0000";
 
+        this.flippedRight = !this.flippedRight;
+        if(this.flippedRight)   //Kugel nach rechts bewegen.
+        {
+            this.posX = this.X + ((this.pos + this.kugelnProStange) * (this.spacing + this.radius));
+            for(var i = this.pos + 1; i < this.kugelnProStange; i++)
+            {
+                if(!this.stange.kugeln[i].flippedRight)
+                    this.stange.kugeln[i].flip();
+            }
+
+        }
+        else                    //Kugel nach links bewegen.
+        {
+            this.posX = this.X + (this.pos * (this.spacing + this.radius));
+            for(var i = this.pos - 1; i >= 0; i--)
+            {
+                if(this.stange.kugeln[i].flippedRight)
+                    this.stange.kugeln[i].flip();
+            }
+        }
+        this.draw();
+    }
+
+    draw()
+    {       
+        var kugel = document.getElementById(this.id); 
+        kugel.style = "" +
+        "background-color:" + this.kugelColor + "; " + 
+        "z-index: 1; " +
+        "position: absolute; " +
+        "width:" + this.radius + "px; " +
+        "height:" + this.radius + "px; " +
+        "top:" + this.posY + "px; " +
+        "left:" + this.posX + "px; "+
+        "transition-duration:" + this.tSpeed + "s; " +
+        "border-radius:" + this.radius + "px; ";
+    }
+
+    create(X,Y)
+    {
+
+        this.posY = Y - (this.radius/2);
+        this.posX = X + (this.pos * (this.spacing + this.radius));
+        this.kugelColor = "#FF0000";
+        this.X = X;
+        this.Y = Y;
         var kugel = document.createElement("div");
         
         kugel.id = this.id;
         kugel.style = "" +
-        "background-color:" + kugelColor + "; " + 
+        "background-color:" + this.kugelColor + "; " + 
         "z-index: 1; " +
         "position: absolute; " +
-        "width:" + radius + "px; " +
-        "height:" + radius + "px; " +
-        "top:" + posY + "px; " +
-        "left:" + posX + "px; "+
-        "border-radius:" + radius + "px; ";
+        "width:" + this.radius + "px; " +
+        "height:" + this.radius + "px; " +
+        "top:" + this.posY + "px; " +
+        "left:" + this.posX + "px; "+
+        "border-radius:" + this.radius + "px; ";
         console.log(this.id);
         kugel.addEventListener('click',function()
         {
@@ -53,20 +110,19 @@ class Kugel
 
 class Stange
 {
-    constructor(pos)
+    constructor(pos,wert)
     {
-
+        
         this.settings = JSON.parse(globalJson);
         this.kugelnProStange = this.settings['KugelnProStange'];
 
-        this.pos = pos;                 //Die Position im Array
-        this.wert = Math.pow(10,pos)    // Die erste Stange bildet die 1er stellen, 
-                                        // also 10^0, die zweite Stange die 10er Stellen also  10^1. etc..
-        
+        this.pos = pos;                 
+        this.wert = wert;               
+                                          
         this.kugeln = new Array();      
         for(var i = this.kugelnProStange; i >= 0; i--)
         {
-            this.kugeln[i] = new Kugel(i,""+pos+"-"+i);
+            this.kugeln[i] = new Kugel(i,""+pos+"-"+i,this.wert,this);
         }
     }
 
@@ -85,7 +141,7 @@ class Stange
         return wert;
     }
 
-    draw(X,Y)
+    create(X,Y)
     {
         var kugelRadius = this.settings["KugelRadius"];
         var kugelSpacing = this.settings["KugelSpacing"];
@@ -111,7 +167,7 @@ class Stange
         //Kugeln drawn
         for(var i = 0; i < this.kugelnProStange; i++)
         {
-            this.kugeln[i].draw(posX,posY);
+            this.kugeln[i].create(posX,posY);
         }
 
     }
@@ -119,18 +175,22 @@ class Stange
 
 class Abakus
 {
-    constructor()
+    constructor(x,y)
     {
         //json parsen
+        var counter = 0;
         this.settings = JSON.parse(globalJson);
 
+        this.anzahlKugelnProStange = this.settings['KugelnProStange'];
         this.anzahlStangen = this.settings['Stangen'];
         this.stangen = new Array();
         this.value = 0;
         for(var i = this.anzahlStangen -1; i >=0; i--)
         {
-            this.stangen[i] = new Stange(i);
+            this.stangen[i] = new Stange(i,Math.pow(10,counter));
+            counter++;
         }
+        
     }
 
     //"gesammtWert()" gibt den Gesammtwert des Abakus zurück, das heißt den Wert aller 
@@ -145,28 +205,64 @@ class Abakus
         return  wert;
     }
 
-    draw(X,Y)
+    stange(pos)
+    {
+        return stangen[pos];
+    }
+
+    kugel(id)
+    {
+        for(var i = 0; i < this.anzahlStangen; i++)
+        {
+            var currentStange = this.stangen[i];
+            for(var j = 0; j < this.anzahlKugelnProStange; j++)
+            {
+                if(currentStange.kugeln[j].id === id)
+                {
+                    return currentStange.kugeln[j];
+                }            
+            }
+        }
+        return undefined;
+    }
+
+    create(X,Y)
     {
         //Stangen drawen
         for(var i = 0; i < this.anzahlStangen; i++)
         {
-            this.stangen[i].draw(X,Y);
+            this.stangen[i].create(X,Y);
         }
 
-        //Rahmen drawen
+        var text = document.createElement("p")
+        text.id = "wertAnzeige";
+        text.innerText = this.gesammtWert;
+        document.body.appendChild(text);
+
+
+        //Rahmen drawenfah
+        var sockel = document.createElement("div");
+        var leftBar = document.createElement("div");
+        var rightBar = document.createElement("div");
+
     }
 
 }
 
+var abakus = new Abakus();
+
 function moveKugel(x)
 {
-    var kugel = document.getElementById(x);
-    console.log(kugel.id);
+    var HTMLkugel = document.getElementById(x);
+    var anzeige = document.getElementById("wertAnzeige");
+    var kugel = abakus.kugel(HTMLkugel.id);
+    kugel.flip();
+    anzeige.innerText = abakus.gesammtWert;
+
+    console.log(kugel.wert);
 }
 
 function main()
 {
-    var abakus = new Abakus();
-    abakus.draw(200,200);
-    console.log(abakus.gesammtWert);
+    abakus.create(200,200);   
 }
