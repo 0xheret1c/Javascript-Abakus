@@ -15,7 +15,7 @@ var globalJson = '{'+
 
 
 class Kugel
-{   constructor(pos,id,wert,stange)
+{   constructor(pos,id,wert,stange, farbe)
     {
         this.stange = stange;
         this.wert = wert;
@@ -33,7 +33,7 @@ class Kugel
         this.kugelnProStange = this.settings["KugelnProStange"];
         this.posY = undefined;
         this.posX = undefined;
-        this.kugelColor = "#FF0000";
+        this.kugelColor = farbe;
     }
 
     flip()
@@ -82,7 +82,7 @@ class Kugel
 
         this.posY = Y - (this.radius/2);
         this.posX = X + (this.pos * (this.spacing + this.radius));
-        this.kugelColor = "#FF0000";
+        //this.kugelColor = "#FF0000";
         this.X = X;
         this.Y = Y;
         var kugel = document.createElement("div");
@@ -110,7 +110,7 @@ class Kugel
 
 class Stange
 {
-    constructor(pos,wert)
+    constructor(pos,wert, farbe)
     {
         
         this.settings = JSON.parse(globalJson);
@@ -122,7 +122,7 @@ class Stange
         this.kugeln = new Array();      
         for(var i = this.kugelnProStange; i >= 0; i--)
         {
-            this.kugeln[i] = new Kugel(i,""+pos+"-"+i,this.wert,this);
+            this.kugeln[i] = new Kugel(i,""+pos+"-"+i,this.wert,this, farbe);
         }
     }
 
@@ -149,7 +149,7 @@ class Stange
         var rahmenThickness = this.settings["RahmenThickness"];
         var stangenThickness = this.settings["StangenThickness"];
         var stangenColor = this.settings["StangenColor"];
-        var stangenLength = 2 * (this.kugelnProStange * (kugelRadius + kugelSpacing));
+        var stangenLength = 2 * (this.kugelnProStange * (kugelRadius + kugelSpacing));		
         var posY = Y + this.pos * (stangenSpacing + kugelRadius);
         var posX = rahmenThickness + X;
         var stange = document.createElement("div");
@@ -179,6 +179,7 @@ class Abakus
     {
         //json parsen
         var counter = 0;
+        var farbe = "#FF0000";	//Damit Kugeln in jedem Fall eine Farbe haben
         this.settings = JSON.parse(globalJson);
 
         this.anzahlKugelnProStange = this.settings['KugelnProStange'];
@@ -187,7 +188,25 @@ class Abakus
         this.value = 0;
         for(var i = this.anzahlStangen -1; i >=0; i--)
         {
-            this.stangen[i] = new Stange(i,Math.pow(10,counter));
+        	switch (i)
+        	{
+        		case 0:
+        			farbe = "#FF0000";
+        			break;
+        		case 1:
+        			farbe = "#FF8000";
+        			break;
+        		case 2:
+        			farbe = "#D7DF01";
+        			break;
+        		case 3:
+        			farbe = "#088A08";
+        			break;
+        		case 4:
+        			farbe = "#0000FF";
+        			break;
+        	}
+            this.stangen[i] = new Stange(i,Math.pow(10,counter), farbe);
             counter++;
         }
         
@@ -228,6 +247,34 @@ class Abakus
 
     create(X,Y)
     {
+    	//Abakus Rahmen drawen
+    	var linkerRahmen = document.createElement("div");
+        
+    	linkerRahmen.style = "" +
+        "background-color: #7401DF; " + 
+        "z-index: 1; " +
+        "position: absolute; " +
+        "width:" + 50 + "px; " +
+        "height:" + 300 + "px; " +
+        "top:" + (Y-35) + "px; " +
+        "left:" + (X) + "px; "+
+        "border-radius:" + 30 + "px; ";
+    	document.body.appendChild(linkerRahmen);
+    	
+    	
+    	var rechterRahmen = document.createElement("div");
+    	rechterRahmen.style = "" +
+        "background-color: #7401DF; " + 
+        "z-index: 2; " +
+        "position: absolute; " +
+        "width:" + 50 + "px; " +
+        "height:" + 300 + "px; " +
+        "top:" + (Y-35) + "px; " +
+        "left:" + (2*this.settings['KugelnProStange'] * (this.settings["KugelRadius"] + this.settings["KugelSpacing"]) + X) + "px; "+
+        "border-radius:" + 30 + "px; ";
+    	document.body.appendChild(rechterRahmen);
+    	
+    	
         //Stangen drawen
         for(var i = 0; i < this.anzahlStangen; i++)
         {
@@ -264,5 +311,5 @@ function moveKugel(x)
 
 function main()
 {
-    abakus.create(200,200);   
+    abakus.create(150,200); 
 }
