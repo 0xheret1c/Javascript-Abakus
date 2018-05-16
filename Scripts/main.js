@@ -99,7 +99,7 @@ class Kugel
         "top:" + this.posY + "px; " +
         "left:" + this.posX + "px; "+
         "border-radius:" + this.radius + "px; ";
-        console.log(this.id);
+        //console.log(this.id);
         kugel.addEventListener('click',function()
         {
             moveKugel(this.id);
@@ -283,16 +283,45 @@ class Abakus
             this.stangen[i].create(X,Y);
         }
 
-        var text = document.createElement("p")
+        //Wertfeld erzeugen
+        var text = document.createElement("p");
         text.id = "wertAnzeige";
+        text.style = "" +
+        "position: absolute; " +
+        "top: " + (Y + 300) + "px;" +
+        "left: " + X + "px";
         text.innerText = this.gesammtWert;
         document.body.appendChild(text);
+        
+        //Eingabefeld erzeugen
+        var textBox = document.createElement("input");
+        textBox.type = "text";
+        textBox.id = "wertEingabe";
+        textBox.style = "" +
+        "position: absolute; " +
+        "top: " + (Y + 315) + "px;" +
+        "left: " + (X + 45) + "px";
+        document.body.appendChild(textBox);
+        
+        //Button erzeugen
+        var button = document.createElement("input");
+        button.type = "submit";
+        button.value = "Senden";
+        button.id = "send";
+        button.style = "" +
+        "position: absolute; " +
+        "top: " + (Y + 315) + "px;" +
+        "left: " + (X + 220) + "px";
+        button.addEventListener('click',function()
+                {
+                    moveKugel("0-0");
+                });
+        document.body.appendChild(button);
 
-
-        //Rahmen drawenfah
+       /* //Rahmen drawen
         var sockel = document.createElement("div");
         var leftBar = document.createElement("div");
-        var rightBar = document.createElement("div");
+        var rightBar = document.createElement("div");*/
 
     }
 
@@ -332,24 +361,19 @@ function back(col)
 	    kugel.flip();
 	}
 	
-	if ((col-1) >= 0) {
-		var HTMLkugel2 = document.getElementById((col-1) + "-9");
+	/*if ((col-1) >= 0) {
+		/*var HTMLkugel2 = document.getElementById((col-1) + "-9");
 		var kugel2 = abakus.kugel(HTMLkugel2.id);
-		if (kugel2.flippedRight === false)
-		{
-		    kugel2.flip();
-		}
-		/*else if (kugel2.flippedRight)
-		{
-			for (var i = 8; i >= 0; i--) {
-				if (abakus.kugel(document.getElementById((col-1) + "-" + i).id).flippedRight === false) {
-					console.log(i);
-					abakus.kugel(document.getElementById((col-1) + "-" + i).id).flip();
-					i = -1;
-				}
+		
+		for (var i = 9; i >= 0; i--) {
+			if (abakus.kugel(document.getElementById((col-1) + "-" + i).id).flippedRight === false) {
+				console.log(i);
+				abakus.kugel(document.getElementById((col-1) + "-" + i).id).flip();
+				i = -10;
 			}
-		}*/
-	}
+		
+		}
+	}*/
 	
 	anzeige.innerText = abakus.gesammtWert;
 }
