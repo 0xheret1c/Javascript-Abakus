@@ -337,20 +337,33 @@ class Abakus
 
         textBox.addEventListener("keyup",function()
         {
+        	var currentValue = document.getElementById("wertAnzeige").innerText;
             var input = document.getElementById("wertEingabe").value;
             var valid = true;
+            var result = input.match(/\d+/g);
+            console.log(parseInt(result) + parseInt(currentValue));
+            
+            if (result === null || (parseInt(currentValue) + parseInt(result)) > 99999)
+            {
+            	valid = false;
+			}
+            console.log(valid);
+         /*   
             var operator = false;
             for (var i = 0; i < input.length; i++) 
             {
-          
+            	if (!operator)
+            	{
+            		
+				}
             }
-            console.log(valid);
+            
 
 
             if(!valid)
             {
-                /*Button ausgrauen*/
-            }
+                /*Button ausgrauen
+            }*/
         })
 
         document.body.appendChild(textBox);
