@@ -37,11 +37,7 @@ class Kugel
     }
 
 
-    overFlow()
-    {
-        
-        console.log("overflow");
-    }
+
 
     flip()
     {
@@ -70,11 +66,8 @@ class Kugel
             }
         }
 
-        if(this.pos === 0 && this.flippedRight)
-        {
-            this.overFlow();
-        }
 
+        document.getElementById("wertAnzeige").innerText = abakus.gesammtWert;
         this.draw();
     }
 
@@ -116,6 +109,13 @@ class Kugel
         "left:" + this.posX + "px; "+
         "border-radius:" + this.radius + "px; ";
         //console.log(this.id);
+
+        if(this.pos === 0)
+        {
+            console.log("if_Statement");
+            kugel.addEventListener("transitionend", function(){overFlow(this);});
+        }
+
         kugel.addEventListener('click',function()
         {
             
@@ -142,7 +142,7 @@ class Stange
         this.kugeln = new Array();      
         for(var i = this.kugelnProStange; i >= 0; i--)
         {
-            this.kugeln[i] = new Kugel(i,""+pos+"-"+i,this.wert,this, farbe);
+            this.kugeln[i] = new Kugel(i,"id"+pos+"-"+i,this.wert,this, farbe);
         }
     }
 
@@ -334,6 +334,25 @@ class Abakus
         "position: absolute; " +
         "top: " + (Y + 315) + "px;" +
         "left: " + (X + 45) + "px";
+
+        textBox.addEventListener("keyup",function()
+        {
+            var input = document.getElementById("wertEingabe").value;
+            var valid = true;
+            var operator = false;
+            for (var i = 0; i < input.length; i++) 
+            {
+          
+            }
+            console.log(valid);
+
+
+            if(!valid)
+            {
+                /*Button ausgrauen*/
+            }
+        })
+
         document.body.appendChild(textBox);
         
         //Button erzeugen
@@ -346,9 +365,14 @@ class Abakus
         "top: " + (Y + 315) + "px;" +
         "left: " + (X + 220) + "px";
         button.addEventListener('click',function()
-                {
-                    moveKugel("0-0");
-                });
+        {        
+            var input = document.getElementById("wertEingabe").value;
+            for (let i = 0; i < input.length; i++) 
+            {
+                
+            }
+
+        });
         document.body.appendChild(button);
 
     }
@@ -357,14 +381,45 @@ class Abakus
 
 var abakus = new Abakus();
 
+function overFlow(kugel)
+{
+
+    var settings = JSON.parse(globalJson);
+    var kugelnProStange = abakus.anzahlKugelnProStange;
+    var stangenAnzahl = abakus.stangenAnzahl;
+    var _kugel = abakus.kugel(kugel.id);
+
+    if(!_kugel.flippedRight)
+        return
+   
+    console.log("ÖÖÖÖVERLÖÖÖW");
+    if(_kugel.flippedRight)
+    {
+        _kugel.stange.kugeln[kugelnProStange - 1].flip();
+    }
+
+    if(_kugel.stange.pos == 0)
+        return
+
+
+    var naechsteStange = abakus.stangen[_kugel.stange.pos - 1];
+    
+    for(let i = kugelnProStange -1; i >= 0; i--)
+    {
+        if(!naechsteStange.kugeln[i].flippedRight)
+        {
+            naechsteStange.kugeln[i].flip();
+            i = -1;
+        }
+    }
+}
+
 function moveKugel(x)
 {
 	var HTMLkugel = document.getElementById(x);
     var kugel = abakus.kugel(HTMLkugel.id);
     var anzeige = document.getElementById("wertAnzeige");
 	kugel.flip();	 
-    anzeige.innerText = abakus.gesammtWert;
-    console.log(kugel.wert);
 }
 
 function main()
