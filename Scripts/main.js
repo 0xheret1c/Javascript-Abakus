@@ -8,7 +8,7 @@ var globalJson = '{'+
                         '"StangenSpacing": 5,'+
                         '"RahmenThickness":10,'+ 
                         '"StangenThickness":2,'+
-                        '"TransitionSpeed": 1,'+
+                        '"TransitionSpeed": 0.35,'+
                         '"StangenColor":"#000000"'+
                   '}';
 
@@ -36,9 +36,15 @@ class Kugel
         this.kugelColor = farbe;
     }
 
+
+    overFlow()
+    {
+        
+        console.log("overflow");
+    }
+
     flip()
     {
-
         this.flippedRight = !this.flippedRight;
         if(this.flippedRight)   //Kugel nach rechts bewegen.
         {
@@ -47,11 +53,13 @@ class Kugel
             for(var i = this.pos + 1; i < this.kugelnProStange; i++)
             {
                 if(!this.stange.kugeln[i].flippedRight)
+                {
                     this.stange.kugeln[i].flip();
+                }     
             }
 
         }
-        else                    //Kugel nach links bewegen.
+        else   //Kugel nach links bewegen.
         {
  
             this.posX = this.X + (this.pos * (this.spacing + this.radius));
@@ -61,11 +69,18 @@ class Kugel
                     this.stange.kugeln[i].flip();
             }
         }
+
+        if(this.pos === 0 && this.flippedRight)
+        {
+            this.overFlow();
+        }
+
         this.draw();
     }
 
     draw()
-    {       
+    {     
+
         var kugel = document.getElementById(this.id); 
         kugel.style = "" +
         "background-color:" + this.kugelColor + "; " + 
@@ -77,6 +92,7 @@ class Kugel
         "left:" + this.posX + "px; "+
         "transition-duration:" + this.tSpeed + "s; " +
         "border-radius:" + this.radius + "px; ";
+
     }
 
     create(X,Y)
@@ -88,7 +104,7 @@ class Kugel
         this.X = X;
         this.Y = Y;
         var kugel = document.createElement("div");
-        
+
         kugel.id = this.id;
         kugel.style = "" +
         "background-color:" + this.kugelColor + "; " + 
@@ -102,7 +118,9 @@ class Kugel
         //console.log(this.id);
         kugel.addEventListener('click',function()
         {
-            moveKugel(this.id);
+            
+            if(ongoingTransitions === 0)
+                moveKugel(this.id);
         });
 
         document.body.appendChild(kugel);
@@ -175,6 +193,7 @@ class Stange
     }
 }
 
+ongoingTransitions = 0;
 class Abakus
 {
     constructor(x,y)
@@ -184,6 +203,7 @@ class Abakus
         var farbe = "#FF0000";	//Damit Kugeln in jedem Fall eine Farbe haben
         this.settings = JSON.parse(globalJson);
 
+        
         this.anzahlKugelnProStange = this.settings['KugelnProStange'];
         this.anzahlStangen = this.settings['Stangen'];
         this.stangen = new Array();
@@ -213,6 +233,7 @@ class Abakus
         }
         
     }
+
 
     //"gesammtWert()" gibt den Gesammtwert des Abakus zurück, das heißt den Wert aller 
     //Gesammtwerte der Stangen.
@@ -274,7 +295,19 @@ class Abakus
         "top:" + (Y-35) + "px; " +
         "left:" + (2*this.settings['KugelnProStange'] * (this.settings["KugelRadius"] + this.settings["KugelSpacing"]) + X) + "px; "+
         "border-radius:" + 30 + "px; ";
-    	document.body.appendChild(rechterRahmen);
+        
+        document.body.addEventListener("transitionstart", function()
+        {
+            ongoingTransitions++;
+
+        })
+
+        document.body.addEventListener("transitionend", function()
+        {
+            ongoingTransitions--;
+        })
+        
+        document.body.appendChild(rechterRahmen);
     	
     	
         //Stangen drawen
@@ -318,11 +351,6 @@ class Abakus
                 });
         document.body.appendChild(button);
 
-       /* //Rahmen drawen
-        var sockel = document.createElement("div");
-        var leftBar = document.createElement("div");
-        var rightBar = document.createElement("div");*/
-
     }
 
 }
@@ -334,48 +362,9 @@ function moveKugel(x)
 	var HTMLkugel = document.getElementById(x);
     var kugel = abakus.kugel(HTMLkugel.id);
     var anzeige = document.getElementById("wertAnzeige");
-    
-	if ((kugel.id).substring(2,3) === "0" && kugel.flippedRight === false)
-	{
-		var col = parseInt((kugel.id).substring(0,1));
-		HTMLkugel.addEventListener("transitionend", function(){
-			back(col);
-		});
-	}
-	 kugel.flip();
-	 
+	kugel.flip();	 
     anzeige.innerText = abakus.gesammtWert;
     console.log(kugel.wert);
-}
-
-
-function back(col)
-{
-	var anzeige = document.getElementById("wertAnzeige");
-	var HTMLkugel = document.getElementById(col + "-9");
-	
-	var kugel = abakus.kugel(HTMLkugel.id);
-	
-	if (kugel.flippedRight)
-	{
-	    kugel.flip();
-	}
-	
-	/*if ((col-1) >= 0) {
-		/*var HTMLkugel2 = document.getElementById((col-1) + "-9");
-		var kugel2 = abakus.kugel(HTMLkugel2.id);
-		
-		for (var i = 9; i >= 0; i--) {
-			if (abakus.kugel(document.getElementById((col-1) + "-" + i).id).flippedRight === false) {
-				console.log(i);
-				abakus.kugel(document.getElementById((col-1) + "-" + i).id).flip();
-				i = -10;
-			}
-		
-		}
-	}*/
-	
-	anzeige.innerText = abakus.gesammtWert;
 }
 
 function main()
