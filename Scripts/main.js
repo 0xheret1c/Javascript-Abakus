@@ -341,13 +341,13 @@ class Abakus
             var input = document.getElementById("wertEingabe").value;
             var valid = true;
             var result = input.match(/\d+/g);
-            console.log(parseInt(result) + parseInt(currentValue));
+           // console.log(parseInt(result) + parseInt(currentValue));
             
             if (result === null || (parseInt(currentValue) + parseInt(result)) > 99999)
             {
             	valid = false;
 			}
-            console.log(valid);
+           // console.log(valid);
          /*   
             var operator = false;
             for (var i = 0; i < input.length; i++) 
@@ -379,11 +379,33 @@ class Abakus
         "left: " + (X + 220) + "px";
         button.addEventListener('click',function()
         {        
-            var input = document.getElementById("wertEingabe").value;
-            for (let i = 0; i < input.length; i++) 
-            {
-                
-            }
+        	 var input = document.getElementById("wertEingabe").value;
+              input = input.match(/\d+/g);
+             var currentValue = document.getElementById("wertAnzeige").innerText;
+             var result = parseInt(currentValue) + parseInt(input);
+             console.log(result);
+             
+           /* var einer = result % 10;
+             var zehner = (result - einer) % 100;
+             var hunderter = (result - einer - zehner) % 1000;
+             var tausender = (result - einer - zehner - hunderter) % 10000;
+             var zehntausender = (result - einer - zehner - hunderter - tausender) % 100000;
+             
+              zehner = (zehner / 10);
+              hunderter = (hunderter / 100);
+              tausender = (tausender / 1000);
+              zehntausender =(zehntausender / 10000);
+              
+              
+                 var anordnung = [0,9,8,7,6,5,4,3,2,1];
+             var zuBewegendeKugeln = [zehntausender, tausender, hunderter, zehner, einer];
+             
+             /* console.log(4-(""+result).length +1);
+             for (let i = 4; i >= (4-(""+result).length +1); i--) {
+            	 moveKugel("id" + i + "-" + anordnung[zuBewegendeKugeln[i]]);
+			}
+             
+           //  console.log(einer + ", " + zehner + ", " + hunderter + ", " + tausender + ", " + zehntausender);*/
 
         });
         document.body.appendChild(button);
