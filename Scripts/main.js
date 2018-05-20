@@ -380,7 +380,7 @@ class Abakus
         button.addEventListener('click',function()
         {        
         	 var input = document.getElementById("wertEingabe").value;
-              input = input.match(/\d+/g);
+            input = input.match(/\d+/g);
              var currentValue = document.getElementById("wertAnzeige").innerText;
              var result = parseInt(currentValue) + parseInt(input);
              console.log(result);
