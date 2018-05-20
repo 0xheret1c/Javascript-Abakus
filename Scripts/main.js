@@ -380,31 +380,6 @@ class Abakus
         {        
             var input = document.getElementById("wertEingabe").value;
             input = input.match(/\d+/g);
-             var currentValue = document.getElementById("wertAnzeige").innerText;
-             var result = parseInt(currentValue) + parseInt(input);
-             console.log(result);
-             
-           /* var einer = result % 10;
-             var zehner = (result - einer) % 100;
-             var hunderter = (result - einer - zehner) % 1000;
-             var tausender = (result - einer - zehner - hunderter) % 10000;
-             var zehntausender = (result - einer - zehner - hunderter - tausender) % 100000;
-             
-              zehner = (zehner / 10);
-              hunderter = (hunderter / 100);
-              tausender = (tausender / 1000);
-              zehntausender =(zehntausender / 10000);
-              
-              
-                 var anordnung = [0,9,8,7,6,5,4,3,2,1];
-             var zuBewegendeKugeln = [zehntausender, tausender, hunderter, zehner, einer];
-             
-             /* console.log(4-(""+result).length +1);
-             for (let i = 4; i >= (4-(""+result).length +1); i--) {
-            	 moveKugel("id" + i + "-" + anordnung[zuBewegendeKugeln[i]]);
-			}
-             
-           //  console.log(einer + ", " + zehner + ", " + hunderter + ", " + tausender + ", " + zehntausender);*/
             var currentValue = document.getElementById("wertAnzeige").innerText;
             var result = parseInt(currentValue) + parseInt(input);
             
@@ -452,6 +427,7 @@ function overFlow(kugel)
     if(!_kugel.flippedRight)
         return
    
+
     if(_kugel.flippedRight)
     {
         _kugel.stange.kugeln[kugelnProStange - 1].flip();
