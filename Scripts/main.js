@@ -112,7 +112,6 @@ class Kugel
 
         if(this.pos === 0)
         {
-            console.log("if_Statement");
             kugel.addEventListener("transitionend", function(){overFlow(this);});
         }
 
@@ -379,7 +378,7 @@ class Abakus
         "left: " + (X + 220) + "px";
         button.addEventListener('click',function()
         {        
-        	 var input = document.getElementById("wertEingabe").value;
+            var input = document.getElementById("wertEingabe").value;
             input = input.match(/\d+/g);
              var currentValue = document.getElementById("wertAnzeige").innerText;
              var result = parseInt(currentValue) + parseInt(input);
@@ -406,6 +405,32 @@ class Abakus
 			}
              
            //  console.log(einer + ", " + zehner + ", " + hunderter + ", " + tausender + ", " + zehntausender);*/
+            var currentValue = document.getElementById("wertAnzeige").innerText;
+            var result = parseInt(currentValue) + parseInt(input);
+            
+            var counter = (""+input).length;
+
+            /*Für jede stelle x mal flippen*/ 
+            for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
+            {
+                var currentStange = abakus.stangen[i];
+                var currentZahl = (""+input)[counter];
+                counter--;
+                   
+                for(let j = 0; j < currentZahl; j++)
+                {
+                    /*Flippe immer die letzte nicht geflippte zahl */
+                    for(let x = abakus.anzahlKugelnProStange - 1; x >= 0; x--)
+                    {
+                        if(!currentStange.kugeln[x].flippedRight)
+                        {
+                            currentStange.kugeln[x].flip();
+                            x = -1;
+                        }
+                    }
+                }
+            }
+            
 
         });
         document.body.appendChild(button);
@@ -427,7 +452,6 @@ function overFlow(kugel)
     if(!_kugel.flippedRight)
         return
    
-    console.log("ÖÖÖÖVERLÖÖÖW");
     if(_kugel.flippedRight)
     {
         _kugel.stange.kugeln[kugelnProStange - 1].flip();
