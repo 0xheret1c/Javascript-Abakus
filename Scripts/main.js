@@ -8,7 +8,7 @@ var globalJson = '{'+
                         '"StangenSpacing": 5,'+
                         '"RahmenThickness":10,'+ 
                         '"StangenThickness":2,'+
-                        '"TransitionSpeed": 0.35,'+
+                        '"TransitionSpeed": 1,'+
                         '"StangenColor":"#000000"'+
                   '}';
 
@@ -336,15 +336,16 @@ class Abakus
 
         textBox.addEventListener("keyup",function()
         {
-        	var currentValue = document.getElementById("wertAnzeige").innerText;
+        	var currentValue = parseInt(document.getElementById("wertAnzeige").innerText);
             var input = document.getElementById("wertEingabe").value;
-            var valid = true;
-            var result = input.match(/\d+/g);
-            
-            if (result === null || (parseInt(currentValue) + parseInt(result)) > 99999)
-            {
-            	valid = false;
+            input = parseInt(input.replace(/\s/g,''));
+            console.log(input);
+            if (currentValue + input < 0 || currentValue + input > 99999) {
+            	document.getElementById("send").disabled = true;
 			}
+            else {
+            	document.getElementById("send").disabled = false;
+            }
         })
 
         document.body.appendChild(textBox);
@@ -361,7 +362,7 @@ class Abakus
         button.addEventListener('click',function()
         {        
             var input = document.getElementById("wertEingabe").value;
-            input = input.match(/\d+/g);
+            input = parseInt(input.replace(/\s/g,''));
             var currentValue = document.getElementById("wertAnzeige").innerText;
             var result = parseInt(currentValue) + parseInt(input);
             
