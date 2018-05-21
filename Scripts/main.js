@@ -333,7 +333,7 @@ class Abakus
         "position: absolute; " +
         "top: " + (Y + 315) + "px;" +
         "left: " + (X + 45) + "px";
-
+    	
         textBox.addEventListener("keyup",function()
         {
         	var currentValue = parseInt(document.getElementById("wertAnzeige").innerText);
@@ -342,18 +342,29 @@ class Abakus
             console.log(input);
             if (currentValue + input < 0 || currentValue + input > 99999) {
             	document.getElementById("send").disabled = true;
+            	document.getElementById("errorMessage").innerHTML = "Der aktuelle Wert des Abakus' darf durch die Addition der "
+            											+"eingegebenen Zahl nicht über 99999 oder unter 0 fallen.";
 			}
             else {
             	document.getElementById("send").disabled = false;
+            	document.getElementById("errorMessage").innerHTML = "";
             }
         })
-
         document.body.appendChild(textBox);
         
+        //Für die Fehlermeldung bei ungültiger Eingabe
+        var errorMessage = document.createElement("p");
+        errorMessage.id = "errorMessage"
+    	errorMessage.style = "" +
+        "position: absolute; " +
+        "top: " + (Y + 325) + "px;" +
+        "left: " + X + "px";
+    	 document.body.appendChild(errorMessage);
+    	 
         //Button erzeugen
         var button = document.createElement("input");
         button.type = "submit";
-        button.value = "Senden";
+        button.value = "rechne";
         button.id = "send";
         button.style = "" +
         "position: absolute; " +
