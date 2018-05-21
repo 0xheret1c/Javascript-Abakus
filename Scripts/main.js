@@ -336,23 +336,7 @@ class Abakus
         "top: " + (Y + 315) + "px;" +
         "left: " + (X + 45) + "px";
     	
-        textBox.addEventListener("keyup",function()
-        {
-        	var currentValue = parseInt(document.getElementById("wertAnzeige").innerText);
-            var input = document.getElementById("wertEingabe").value;
-            input = parseInt(input.replace(/\s/g,''));
-            if (currentValue + input < 0 || currentValue + input > 99999) 
-            {
-            	document.getElementById("send").disabled = true;
-            	document.getElementById("errorMessage").innerHTML = "Der aktuelle Wert des Abakus' darf durch die Addition der "
-            											+"eingegebenen Zahl nicht über 99999 oder unter 0 fallen.";
-			}
-            else 
-            {
-            	document.getElementById("send").disabled = false;
-            	document.getElementById("errorMessage").innerHTML = "";
-            }
-        })
+        textBox.addEventListener("keyup",valid)
         document.body.appendChild(textBox);
         
         //Für die Fehlermeldung bei ungültiger Eingabe
@@ -374,39 +358,41 @@ class Abakus
         "top: " + (Y + 315) + "px;" +
         "left: " + (X + 220) + "px";
         button.addEventListener('click',function()
-        {        
-            var input = document.getElementById("wertEingabe").value;
-            input = parseInt(input.replace(/\s/g,''));
-            var counter = (""+input).length;
-
-            /*Für jede stelle x mal flippen*/ 
-            
-            if (input > 0)
-            {
-            	for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
-                {
-                    var currentStange = abakus.stangen[i];
-                    var currentZahl = (""+input)[counter];
-                    console.log(currentZahl);	
-                    counter--;
-                       
-                    for(let j = 0; j < currentZahl; j++)
-                    {
-                        /*Flippe immer die letzte nicht geflippte zahl */
-                        for(let x = abakus.anzahlKugelnProStange - 1; x >= 0; x--)
-                        {
-                            if(!currentStange.kugeln[x].flippedRight)
-                            {
-                                currentStange.kugeln[x].flip();
-                                x = -1;
-                            }
-                        }
-                    }
-                }
-			}
-            if (input < 0) {
-            	//Minus Minus Minus .-.
-			}
+        {	
+        	if (valid() === true)
+        	{
+	            var input = document.getElementById("wertEingabe").value;
+	            input = parseInt(input.replace(/\s/g,''));
+	            var counter = (""+input).length;
+	
+	            /*Für jede stelle x mal flippen*/ 
+	            
+	            if (input > 0)
+	            {
+	            	for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
+	                {
+	                    var currentStange = abakus.stangen[i];
+	                    var currentZahl = (""+input)[counter];
+	                    counter--;
+	                       
+	                    for(let j = 0; j < currentZahl; j++)
+	                    {
+	                        /*Flippe immer die letzte nicht geflippte zahl */
+	                        for(let x = abakus.anzahlKugelnProStange - 1; x >= 0; x--)
+	                        {
+	                            if(!currentStange.kugeln[x].flippedRight)
+	                            {
+	                                currentStange.kugeln[x].flip();
+	                                x = -1;
+	                            }
+	                        }
+	                    }
+	                }
+				}
+	            if (input < 0) {
+	            	//Minus Minus Minus .-.
+				}
+        	}
         });
         document.body.appendChild(button);
 
@@ -415,6 +401,26 @@ class Abakus
 }
 
 var abakus = new Abakus();
+
+function valid()
+{
+	var currentValue = parseInt(document.getElementById("wertAnzeige").innerText);
+    var input = document.getElementById("wertEingabe").value;
+    input = parseInt(input.replace(/\s/g,''));
+    if (currentValue + input < 0 || currentValue + input > 99999) 
+    {
+    	document.getElementById("send").disabled = true;
+    	document.getElementById("errorMessage").innerHTML = "Der aktuelle Wert des Abakus' darf durch die Addition der "
+    											+"eingegebenen Zahl nicht über 99999 oder unter 0 fallen.";
+    	return false;
+	}
+    else 
+    {
+    	document.getElementById("send").disabled = false;
+    	document.getElementById("errorMessage").innerHTML = "";
+    	return true;
+    }
+}
 
 function overFlow(kugel)
 {
