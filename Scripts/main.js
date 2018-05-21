@@ -298,12 +298,14 @@ class Abakus
         document.body.addEventListener("transitionstart", function()
         {
             ongoingTransitions++;
+            document.getElementById("send").disabled = true;
 
         })
 
         document.body.addEventListener("transitionend", function()
         {
             ongoingTransitions--;
+            document.getElementById("send").disabled = false;
         })
         
         document.body.appendChild(rechterRahmen);
@@ -339,13 +341,14 @@ class Abakus
         	var currentValue = parseInt(document.getElementById("wertAnzeige").innerText);
             var input = document.getElementById("wertEingabe").value;
             input = parseInt(input.replace(/\s/g,''));
-            console.log(input);
-            if (currentValue + input < 0 || currentValue + input > 99999) {
+            if (currentValue + input < 0 || currentValue + input > 99999) 
+            {
             	document.getElementById("send").disabled = true;
             	document.getElementById("errorMessage").innerHTML = "Der aktuelle Wert des Abakus' darf durch die Addition der "
             											+"eingegebenen Zahl nicht über 99999 oder unter 0 fallen.";
 			}
-            else {
+            else 
+            {
             	document.getElementById("send").disabled = false;
             	document.getElementById("errorMessage").innerHTML = "";
             }
@@ -374,33 +377,36 @@ class Abakus
         {        
             var input = document.getElementById("wertEingabe").value;
             input = parseInt(input.replace(/\s/g,''));
-            var currentValue = document.getElementById("wertAnzeige").innerText;
-            var result = parseInt(currentValue) + parseInt(input);
-            
             var counter = (""+input).length;
 
             /*Für jede stelle x mal flippen*/ 
-            for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
+            
+            if (input > 0)
             {
-                var currentStange = abakus.stangen[i];
-                var currentZahl = (""+input)[counter];
-                counter--;
-                   
-                for(let j = 0; j < currentZahl; j++)
+            	for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
                 {
-                    /*Flippe immer die letzte nicht geflippte zahl */
-                    for(let x = abakus.anzahlKugelnProStange - 1; x >= 0; x--)
+                    var currentStange = abakus.stangen[i];
+                    var currentZahl = (""+input)[counter];
+                    console.log(currentZahl);	
+                    counter--;
+                       
+                    for(let j = 0; j < currentZahl; j++)
                     {
-                        if(!currentStange.kugeln[x].flippedRight)
+                        /*Flippe immer die letzte nicht geflippte zahl */
+                        for(let x = abakus.anzahlKugelnProStange - 1; x >= 0; x--)
                         {
-                            currentStange.kugeln[x].flip();
-                            x = -1;
+                            if(!currentStange.kugeln[x].flippedRight)
+                            {
+                                currentStange.kugeln[x].flip();
+                                x = -1;
+                            }
                         }
                     }
                 }
-            }
-            
-
+			}
+            if (input < 0) {
+            	//Minus Minus Minus .-.
+			}
         });
         document.body.appendChild(button);
 
