@@ -68,6 +68,7 @@ class Kugel
 
 
         document.getElementById("wertAnzeige").innerText = abakus.gesammtWert;
+        document.getElementById("wertAnzeigeOnTop").innerText = abakus.gesammtWert;
         this.draw();
     }
 
@@ -168,7 +169,7 @@ class Stange
         var rahmenThickness = this.settings["RahmenThickness"];
         var stangenThickness = this.settings["StangenThickness"];
         var stangenColor = this.settings["StangenColor"];
-        var stangenLength = 2 * (this.kugelnProStange * (kugelRadius + kugelSpacing));		
+        var stangenLength = 2 * (this.kugelnProStange * (kugelRadius + kugelSpacing));	
         var posY = Y + this.pos * (stangenSpacing + kugelRadius);
         var posX = rahmenThickness + X;
         var stange = document.createElement("div");
@@ -269,11 +270,34 @@ class Abakus
 
     create(X,Y)
     {
+    	//Anzeigetafel drawen
+    	var wertRahmen = document.createElement("div");
+    	wertRahmen.id = "wertOnTop";
+    	wertRahmen.style = "" +
+    	"z-index: 2; " +
+        "position: absolute; " +
+        "width:" + 100 + "px; " +
+        "height:" + 50 + "px; " +
+        "top:" + (Y-150) + "px; " +
+        "left:" + (X+500) + "px; ";
+    	
+    	//Anzeigewert erzeugen
+        var anzeigeWert = document.createElement("p");
+        anzeigeWert.id = "wertAnzeigeOnTop";
+        anzeigeWert.style = ""+
+        "font-size: 30px;";
+        anzeigeWert.innerText = this.gesammtWert;
+        wertRahmen.appendChild(anzeigeWert);
+        
+    	document.body.appendChild(wertRahmen);
+    	
+    	
+    	
     	//Abakus Rahmen drawen
     	var linkerRahmen = document.createElement("div");
         
     	linkerRahmen.style = "" +
-        "background-color: #7401DF; " + 
+        "background-color: #000000; " +				//Lila Farbcode: #7401DF 
         "z-index: 1; " +
         "position: absolute; " +
         "width:" + 50 + "px; " +
@@ -286,7 +310,7 @@ class Abakus
     	
     	var rechterRahmen = document.createElement("div");
     	rechterRahmen.style = "" +
-        "background-color: #7401DF; " + 
+        "background-color: #000000; " + 
         "z-index: 2; " +
         "position: absolute; " +
         "width:" + 50 + "px; " +
@@ -393,24 +417,23 @@ class Abakus
 				}
 	            if (input < 0) {
 	            	//Minus Minus Minus .-.
-	            	
 	            	for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
 	                {
 	                    var currentStange = abakus.stangen[i];
 	                    var currentZahl = (""+input)[counter];
 	                    counter--;
-	                       
+                    	
 	                    for(let j = 0; j < currentZahl; j++)
 	                    {
 	                    	alert("test");
 	                    		/*Flippe immer die erste geflippte zahl */
 		                        for(let x = 1; x <= abakus.anzahlKugelnProStange - 1; x++)
 		                        {
-		                            if(currentStange.kugeln[x].flippedRight)
-		                            {
-		                                currentStange.kugeln[x].flip();
-		                                x = abakus.anzahlKugelnProStange +1;
-		                            }
+		                        		 if(currentStange.kugeln[x].flippedRight)
+				                            {
+				                                currentStange.kugeln[x].flip();
+				                                x = abakus.anzahlKugelnProStange +1;
+				                            }
 		                        }
 		                    
 	                    }
@@ -483,7 +506,7 @@ function moveKugel(x)
 {
 	var HTMLkugel = document.getElementById(x);
     var kugel = abakus.kugel(HTMLkugel.id);
-    var anzeige = document.getElementById("wertAnzeige");
+  //  var anzeige = document.getElementById("wertAnzeige");
 	kugel.flip();	 
 }
 
