@@ -377,20 +377,44 @@ class Abakus
 	                       
 	                    for(let j = 0; j < currentZahl; j++)
 	                    {
-	                        /*Flippe immer die letzte nicht geflippte zahl */
-	                        for(let x = abakus.anzahlKugelnProStange - 1; x >= 0; x--)
-	                        {
-	                            if(!currentStange.kugeln[x].flippedRight)
-	                            {
-	                                currentStange.kugeln[x].flip();
-	                                x = -1;
-	                            }
-	                        }
+	                    	alert("test");
+	                    		/*Flippe immer die letzte nicht geflippte zahl */
+		                        for(let x = abakus.anzahlKugelnProStange - 1; x >= 0; x--)
+		                        {
+		                            if(!currentStange.kugeln[x].flippedRight)
+		                            {
+		                                currentStange.kugeln[x].flip();
+		                                x = -1;
+		                            }
+		                        }
+		                    
 	                    }
 	                }
 				}
 	            if (input < 0) {
 	            	//Minus Minus Minus .-.
+	            	
+	            	for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
+	                {
+	                    var currentStange = abakus.stangen[i];
+	                    var currentZahl = (""+input)[counter];
+	                    counter--;
+	                       
+	                    for(let j = 0; j < currentZahl; j++)
+	                    {
+	                    	alert("test");
+	                    		/*Flippe immer die erste geflippte zahl */
+		                        for(let x = 1; x <= abakus.anzahlKugelnProStange - 1; x++)
+		                        {
+		                            if(currentStange.kugeln[x].flippedRight)
+		                            {
+		                                currentStange.kugeln[x].flip();
+		                                x = abakus.anzahlKugelnProStange +1;
+		                            }
+		                        }
+		                    
+	                    }
+	                }
 				}
         	}
         });
