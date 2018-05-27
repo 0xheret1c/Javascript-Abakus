@@ -592,8 +592,9 @@ function overFlow(kugel)
     var settings = JSON.parse(globalJson);
     var kugelnProStange = abakus.anzahlKugelnProStange;
     var stangenAnzahl = abakus.stangenAnzahl;
-    var _kugel = abakus.kugel(kugel.id);
+    var _kugel = abakus.kugel(kugel.id); // Referenzprobleme
 
+    //Wenn die Kugel links ist, kann sie keinen Overflow ausloesen.
     if(!_kugel.flippedRight)
         return
    
