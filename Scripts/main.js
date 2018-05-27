@@ -54,7 +54,7 @@ class Kugel
     {
             // Da wir die Kugel jetzt bewegen, findet eine Transition statt.
             ongoingTransitions++;
-            
+
             if(!this.flippedRight)   //Kugel nach rechts bewegen.
             {
                 /*
@@ -150,7 +150,7 @@ class Kugel
         "top:" + this.posY + "px; " +
         "left:" + this.posX + "px; "+
         "border-radius:" + this.radius + "px; ";
-        //console.log(this.id);
+
 
         // Wenn die position 0 ist, handelt es sich um die Uebertrags-Kugel.
         if(this.pos === 0)
@@ -163,7 +163,7 @@ class Kugel
         // Die click funktion hinzufuegen.
         kugel.addEventListener('click',function()
         {
-            console.log(ongoingTransitions);
+
             // Wenn keine Transitionen mehr stattfinden darf diese ausgefuehrt werden.
             if(ongoingTransitions === 0)
             { 
@@ -550,8 +550,7 @@ function subtrahieren(input)
     {
         ergebnis = "0" + ergebnis;
     }
-    
-    console.log("ergebnis: " +ergebnis);
+
     for (let i = 0; i < abakus.anzahlStangen; i++)
     {
     	let currentStange = abakus.stangen[i];
