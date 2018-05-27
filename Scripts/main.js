@@ -391,7 +391,7 @@ class Abakus
         	if (valid() === true)
         	{
 	            var input = document.getElementById("wertEingabe").value;
-	            input = parseInt(input.replace(/\s/g,''));	        
+	            input = parseInt(input.replace(/\s/g,''));
 	            /*Für jede stelle x mal flippen*/ 
 	            
 	            if (input > 0)
