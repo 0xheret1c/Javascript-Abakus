@@ -459,38 +459,51 @@ function addieren(input)
 function subtrahieren(input)
 {
     var inputLength = (""+input).length;
-    var ergebnis = abakus.gesammtWert - input;
+    var ergebnis = "" + (abakus.gesammtWert - input);
     var ergebnisLength = (""+ergebnis).length;
-
-    /*for(let i = 0; i <= (inputLength - ergebnisLength) + 1; i++)
-    {
-        let currentKugel = abakus.stangen[i].kugeln[abakus.anzahlKugelnProStange - 1];
-        if(currentKugel.flippedRight)
-            currentKugel.flip(); 
-    }
-    */
+    var array = [9,9,8,7,6,5,4,3,2,1];
     
-    /*Ergebnis-string mit Nullen auffüllen */
+    /*Ergebnis-string mit Nullen auffüllen, bis max. length 5*/
     for(let i = 0; i < abakus.anzahlStangen - ergebnisLength; i++)
-        ergebnis = "0" + ergebnis;
-
-    for(let i = 0; i < abakus.anzahlStangen; i++)
     {
-        let currentStange = abakus.stangen[i];
-        let kugel = currentStange.kugeln[(abakus.anzahlKugelnProStange - 1) - ergebnis[i]];
-        if(kugel.flippedRight && egebnis[i] === 0)
-            kugel.flip();
-        else
-        {
-            kugel.flip();
-        }
+        ergebnis = "0" + ergebnis;
     }
-
-    console.log(ergebnis);
-    console.log(abakus.gesammtWert);
-
-   
-
+    
+    console.log("ergebnis: " +ergebnis);
+    for (let i = 0; i < abakus.anzahlStangen; i++)
+    {
+    	let currentStange = abakus.stangen[i];
+    	if (ergebnis[i] == 0)
+    	{
+			if (currentStange.kugeln[array[ergebnis[i]]].flippedRight)
+			{
+				currentStange.kugeln[array[ergebnis[i]]].flip();
+			}
+		}
+    	else
+    	{
+    		if (!currentStange.kugeln[array[ergebnis[i]]].flippedRight)
+    		{
+    			currentStange.kugeln[array[ergebnis[i]]].flip();
+			}
+    		
+    		if (parseInt(ergebnis[i])+1 > array.length)
+    		{
+    			if (!currentStange.kugeln[array[parseInt(ergebnis[i])+1]].flippedRight)
+        		{
+    				currentStange.kugeln[array[1]].flip();
+    			}
+			}
+    		else if (parseInt(ergebnis[i])+1 < array.length)
+    		{
+    			if (currentStange.kugeln[array[parseInt(ergebnis[i])+1]].flippedRight)
+        		{
+    				currentStange.kugeln[array[parseInt(ergebnis[i])+1]].flip();
+    			}
+			}
+    	}
+    	
+	}
 }
 
 function overFlow(kugel)
