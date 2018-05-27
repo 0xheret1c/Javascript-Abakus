@@ -120,8 +120,9 @@ class Kugel
 
         kugel.addEventListener('click',function()
         {
-            
             if(ongoingTransitions === 0)
+            	ongoingTransitions++;
+            	document.getElementById("send").disabled = true;
                 moveKugel(this.id);
         });
 
@@ -322,12 +323,12 @@ class Abakus
         "border-radius:" + 30 + "px; ";
     	document.body.appendChild(rechterRahmen);
     	
-        document.body.addEventListener("transitionstart", function()
+       /* document.body.addEventListener("transitionstart", function()
         {
             ongoingTransitions++;
             document.getElementById("send").disabled = true;
 
-        });
+        });*/
 
         document.body.addEventListener("transitionend", function()
         {
