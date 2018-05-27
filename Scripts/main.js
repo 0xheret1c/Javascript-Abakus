@@ -41,35 +41,37 @@ class Kugel
 
     flip()
     {
-        this.flippedRight = !this.flippedRight;
-        if(this.flippedRight)   //Kugel nach rechts bewegen.
-        {
-            this.posX = this.X + ((this.pos + this.kugelnProStange) * (this.spacing + this.radius));
-            
-            for(var i = this.pos + 1; i < this.kugelnProStange; i++)
+    		this.flippedRight = !this.flippedRight;
+            if(this.flippedRight)   //Kugel nach rechts bewegen.
             {
-                if(!this.stange.kugeln[i].flippedRight)
+                this.posX = this.X + ((this.pos + this.kugelnProStange) * (this.spacing + this.radius));
+                
+                for(var i = this.pos + 1; i < this.kugelnProStange; i++)
                 {
-                    this.stange.kugeln[i].flip();
-                }     
-            }
+                    if(!this.stange.kugeln[i].flippedRight)
+                    {
+                        this.stange.kugeln[i].flip();
+                    }     
+                }
 
-        }
-        else   //Kugel nach links bewegen.
-        {
- 
-            this.posX = this.X + (this.pos * (this.spacing + this.radius));
-            for(var i = this.pos - 1; i >= 0; i--)
+            }
+            else   //Kugel nach links bewegen.
             {
-                if(this.stange.kugeln[i].flippedRight)
-                    this.stange.kugeln[i].flip();
+     
+                this.posX = this.X + (this.pos * (this.spacing + this.radius));
+                for(var i = this.pos - 1; i >= 0; i--)
+                {
+                    if(this.stange.kugeln[i].flippedRight)
+                        this.stange.kugeln[i].flip();
+                }
             }
-        }
 
 
-        document.getElementById("wertAnzeige").innerText = abakus.gesammtWert;
-        document.getElementById("wertAnzeigeOnTop").innerText = abakus.gesammtWert;
-        this.draw();
+            document.getElementById("wertAnzeige").innerText = abakus.gesammtWert;
+            document.getElementById("wertAnzeigeOnTop").innerText = abakus.gesammtWert;
+        	this.draw();
+    	
+        
     }
 
     draw()
@@ -318,21 +320,23 @@ class Abakus
         "top:" + (Y-35) + "px; " +
         "left:" + (2*this.settings['KugelnProStange'] * (this.settings["KugelRadius"] + this.settings["KugelSpacing"]) + X) + "px; "+
         "border-radius:" + 30 + "px; ";
-        
+    	document.body.appendChild(rechterRahmen);
+    	
         document.body.addEventListener("transitionstart", function()
         {
             ongoingTransitions++;
             document.getElementById("send").disabled = true;
 
-        })
+        });
 
         document.body.addEventListener("transitionend", function()
         {
-            ongoingTransitions--;
+        	ongoingTransitions--;
             document.getElementById("send").disabled = false;
-        })
+            
+        });
         
-        document.body.appendChild(rechterRahmen);
+        
     	
     	
         //Stangen drawen
@@ -386,65 +390,24 @@ class Abakus
         	if (valid() === true)
         	{
 	            var input = document.getElementById("wertEingabe").value;
-	            input = parseInt(input.replace(/\s/g,''));
-	            var counter = (""+input).length;
-	
+	            input = parseInt(input.replace(/\s/g,''));	        
 	            /*Für jede stelle x mal flippen*/ 
 	            
 	            if (input > 0)
 	            {
-	            	for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
-	                {
-	                    var currentStange = abakus.stangen[i];
-	                    var currentZahl = (""+input)[counter];
-	                    counter--;
-	                       
-	                    for(let j = 0; j < currentZahl; j++)
-	                    {
-	                    	alert("test");
-	                    		/*Flippe immer die letzte nicht geflippte zahl */
-		                        for(let x = abakus.anzahlKugelnProStange - 1; x >= 0; x--)
-		                        {
-		                            if(!currentStange.kugeln[x].flippedRight)
-		                            {
-		                                currentStange.kugeln[x].flip();
-		                                x = -1;
-		                            }
-		                        }
-		                    
-	                    }
-	                }
+	            	addieren(input);
 				}
-	            if (input < 0) {
-	            	//Minus Minus Minus .-.
-	            	for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
-	                {
-	                    var currentStange = abakus.stangen[i];
-	                    var currentZahl = (""+input)[counter];
-	                    counter--;
-                    	
-	                    for(let j = 0; j < currentZahl; j++)
-	                    {
-	                    	alert("test");
-	                    		/*Flippe immer die erste geflippte zahl */
-		                        for(let x = 1; x <= abakus.anzahlKugelnProStange - 1; x++)
-		                        {
-		                        		 if(currentStange.kugeln[x].flippedRight)
-				                            {
-				                                currentStange.kugeln[x].flip();
-				                                x = abakus.anzahlKugelnProStange +1;
-				                            }
-		                        }
-		                    
-	                    }
-	                }
+	            if (input < 0) 
+	            {
+	            	input = input * (-1);
+	            	subtrahieren(input);
 				}
+	            document.getElementById("wertEingabe").value = "";  
+	            
         	}
         });
         document.body.appendChild(button);
-
     }
-
 }
 
 var abakus = new Abakus();
@@ -469,9 +432,59 @@ function valid()
     }
 }
 
+function addieren(input)
+{
+	var counter = (""+input).length;
+	for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
+    {
+        var currentStange = abakus.stangen[i];
+        var currentZahl = (""+input)[counter];
+        counter--;
+        
+        for(let j = 1; j <= currentZahl; j++)
+        {
+        	alert("test");
+        		/*Flippe immer die letzte nicht geflippte Kugel */
+                for(var x = abakus.anzahlKugelnProStange - 1; x >= 0; x--)
+                {
+                    if(!currentStange.kugeln[x].flippedRight)
+                    {
+                    	currentStange.kugeln[x].flip();
+                    	x = -1;	
+                    }
+                }
+        }
+    }
+}
+
+function subtrahieren(input)
+{
+	var counter = (""+input).length;
+	for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
+    {
+        var currentStange = abakus.stangen[i];
+        var currentZahl = (""+input)[counter];
+        counter--;
+    	
+        for(let j = 0; j < currentZahl; j++)
+        {
+        	//alert("test");
+        		//Flippe immer die erste geflippte zahl 
+                for(let x = 1; x <= abakus.anzahlKugelnProStange - 1; x++)
+                {
+                		 if(currentStange.kugeln[x].flippedRight)
+                            {
+                                currentStange.kugeln[x].flip();
+                                x = abakus.anzahlKugelnProStange +1;
+                            }
+                }
+            
+        }
+    }
+}
+
 function overFlow(kugel)
 {
-
     var settings = JSON.parse(globalJson);
     var kugelnProStange = abakus.anzahlKugelnProStange;
     var stangenAnzahl = abakus.stangenAnzahl;
@@ -502,9 +515,9 @@ function overFlow(kugel)
     }
 }
 
-function moveKugel(x)
+function moveKugel(id)
 {
-	var HTMLkugel = document.getElementById(x);
+	var HTMLkugel = document.getElementById(id);
     var kugel = abakus.kugel(HTMLkugel.id);
   //  var anzeige = document.getElementById("wertAnzeige");
 	kugel.flip();	 
