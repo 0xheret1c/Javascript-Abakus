@@ -1,54 +1,74 @@
 
-//Mit json datei ersetzen, wenn wir wissen wie
-var globalJson = '{'+
-                        '"Stangen": 5,'+
-                        '"KugelnProStange": 10,'+
-                        '"KugelRadius": 50,'+
-                        '"KugelSpacing": 5,'+
-                        '"StangenSpacing": 5,'+
-                        '"RahmenThickness":10,'+ 
-                        '"StangenThickness":2,'+
-                        '"TransitionSpeed": 1,'+
+ // Die Anzahl der zurzeit ausgefuehrten Transtitions. 
+ // Wird beim Start einer Transition erhoet, und beim Stop verringert.
+var ongoingTransitions = 0;
+var globalJson = '{'+                           
+                        '"Stangen": 5,'+                // Anzahl der Stangen
+                        '"KugelnProStange": 10,'+       
+                        '"KugelRadius": 50,'+       
+                        '"KugelSpacing": 5,'+           // Abstand zwischen den Kugeln auf der Stange
+                        '"StangenSpacing": 5,'+         // Abstand der Stangen zueinander
+                        '"RahmenThickness":10,'+        // Breite das Rahmens
+                        '"StangenThickness":2,'+        // Breite der Stangen
+                        '"TransitionSpeed": 1,'+        // Geschwindigkeit der Animationen
                         '"StangenColor":"#000000"'+
                   '}';
 
 
+ 
 
+
+/*Klasse fuer die Kugeln*/ 
 class Kugel
-{   constructor(pos,id,wert,stange, farbe)
+{   
+    constructor(pos,id,wert,stange, farbe)
     {
-        this.stange = stange;
-        this.wert = wert;
-        this.id = id;
-        this.settings = JSON.parse(globalJson);
-        this.flippedRight = false;
-        this.pos = pos;     //position in array
-        this.posX = undefined; // X posigion on abakus
-        this.X = undefined; //X position on page
-        this.Y = undefined; //Y position on page
+        this.stange = stange;       // Referenz auf die Stange, auf der die Kugel sitzt, fuer einfacheres handling.
+        this.wert = wert;           // Wert der Kugel. bsp. 10^1, 10^2 etc.
+        this.id = id;               // ID der Kugel gleich der ID des HTML-Divs. Koennte auch direkt mit Referenz auf das HTML-Element ersetzt werden.
+        this.settings = JSON.parse(globalJson);     // Die Settings...
+        this.flippedRight = false;      // Haelt track ob die Kugel nach Rechts verschoben wurde.
+        this.pos = pos;     //  Eigene position im Kugel-Array der Stange.
+        this.posX = undefined;      // X Position bezueglich des Abakus.
+        this.posY = undefined;      // Y "
+        this.X = undefined; //X Position nicht bezüglich zum Abakus, sondern der ganzen Page.
+        this.Y = undefined; //Y "
+
+        /*Die Settings in variablen uebernehmen, fuer die Uebersicht.*/
         this.spacing = this.settings["KugelSpacing"];
         this.radius = this.settings["KugelRadius"];
         this.spacing = this.settings["KugelSpacing"];
         this.tSpeed = this.settings["TransitionSpeed"];
         this.kugelnProStange = this.settings["KugelnProStange"];
-        this.posY = undefined;
-        this.posX = undefined;
-        this.kugelColor = farbe;
+        this.kugelColor = farbe;        // Farbe der Kugel
     }
 
 
 
-
+    /**
+     * flip() schiebt die Kugel nach Rechts bzw. nach links abhaengig von
+     * flippedRight, und passt flippedRight an. Um die Kugel zu verschieben 
+     * wird die X Position angepasst.
+     */
     flip()
     {
-    		this.flippedRight = !this.flippedRight;
-            if(this.flippedRight)   //Kugel nach rechts bewegen.
+            // Da wir die Kugel jetzt bewegen, findet eine Transition statt.
+            ongoingTransitions++;
+            
+            if(!this.flippedRight)   //Kugel nach rechts bewegen.
             {
-                this.posX = this.X + ((this.pos + this.kugelnProStange) * (this.spacing + this.radius));
+                /*
+                * Die Position der Kugel ergibt sich aus der eigenen Position im Array multipliziert mit dem Platz
+                * den die Kugel benoetigt (Radius + Spacing). Addiert man vorher die Position im Array mit der Anzahl 
+                * aller Kugeln auf der Stange, verschiebt sich die Kugel auf ihren gegenueberliegenden Platz.
+                * */
+                this.posX = this.X + ((this.pos + this.kugelnProStange) * (this.spacing + this.radius));       
                 
-                for(var i = this.pos + 1; i < this.kugelnProStange; i++)
+              
+                // Alle Kugeln mit verschieben, die nicht schon Rechts sind.
+                for(var i = this.pos + 1; i < this.kugelnProStange; i++)    
                 {
-                    if(!this.stange.kugeln[i].flippedRight)
+                    if(!this.stange.kugeln[i].flippedRight) 
                     {
                         this.stange.kugeln[i].flip();
                     }     
@@ -59,21 +79,29 @@ class Kugel
             {
      
                 this.posX = this.X + (this.pos * (this.spacing + this.radius));
+                /* Diesmal von vorne nach hinten durch das Array gehen, 
+                 * damit sich die Kugeln in richtiger Reihenfolge bewegen. */
                 for(var i = this.pos - 1; i >= 0; i--)
                 {
                     if(this.stange.kugeln[i].flippedRight)
                         this.stange.kugeln[i].flip();
                 }
             }
-
-
-            document.getElementById("wertAnzeige").innerText = abakus.gesammtWert;
+            
+            // flippedRight anpassen, da die Kugel nun geflippt ist.  
+            this.flippedRight = !this.flippedRight;
+            // Die Wert-Anzeige anpassen, da sich durch das verschieben der Wert aendert.
+            document.getElementById("wertAnzeige").innerText = abakus.gesammtWert;  
+            //  Die obere Wert-Anzeige anpassen.
             document.getElementById("wertAnzeigeOnTop").innerText = abakus.gesammtWert;
-        	this.draw();
-    	
-        
+            
+            // Mit der Draw funktion den CSS-Teil der Kugel anpassen, damit sie sich verschiebt.
+            this.draw();     
     }
 
+    /**
+     * draw() ueberschreibt den CSS-Teil des Div-Elements der Kugel um ihre Position anzupassen.
+     */
     draw()
     {     
 
@@ -91,17 +119,28 @@ class Kugel
 
     }
 
+    /**
+     * create() erstellt die Kugel an Position X,Y und haengt diese im DOM ein.
+     * X und Y koennten auch direkt im constructor uebergeben werden.
+     */
     create(X,Y)
     {
-
-        this.posY = Y - (this.radius/2);
-        this.posX = X + (this.pos * (this.spacing + this.radius));
-        //this.kugelColor = "#FF0000";
+        // Den Ursprung der sich unten links befindet kompensieren
+        
+        // Die Kugel um die Haelfte nach oben verschieben
+        this.posY = Y - (this.radius/2);   
+        
+        /* Die Position der Kugel ergibt sich aus der eigenen 
+         * Position im Array multipliziert mit dem Platz 
+         * den die Kugel benoetigt (Radius + Spacing) */
+        this.posX = X + (this.pos * (this.spacing + this.radius)); 
+        
         this.X = X;
         this.Y = Y;
-        var kugel = document.createElement("div");
-
+        var kugel = document.createElement("div");  // Das div erstellen.
         kugel.id = this.id;
+
+        // CSS Stuff
         kugel.style = "" +
         "background-color:" + this.kugelColor + "; " + 
         "z-index: 1; " +
@@ -113,24 +152,36 @@ class Kugel
         "border-radius:" + this.radius + "px; ";
         //console.log(this.id);
 
+        // Wenn die position 0 ist, handelt es sich um die Uebertrags-Kugel.
         if(this.pos === 0)
         {
+            /* Der Ubertragskugel die overFlow auf dem transitionend event geben, damit diese
+               ausgeloest wird, wenn sie verschoben wird. */
             kugel.addEventListener("transitionend", function(){overFlow(this);});
         }
 
+        // Die click funktion hinzufuegen.
         kugel.addEventListener('click',function()
         {
+            console.log(ongoingTransitions);
+            // Wenn keine Transitionen mehr stattfinden darf diese ausgefuehrt werden.
             if(ongoingTransitions === 0)
-            	ongoingTransitions++;
-            	document.getElementById("send").disabled = true;
+            { 
+                // Den Berechnen-Button deaktivieren, da waehrend einer Transition keine weiter Aktion statt
+                // statt finden darf. Er wird spaeter beim transitionend-event reaktiviert.
+                document.getElementById("send").disabled = true;
+
+                // Die Kugel bewegen.
                 moveKugel(this.id);
+            }
         });
 
-        document.body.appendChild(kugel);
+        document.body.appendChild(kugel); // Die Kugel in das DOM haengen.
 
     }
 }
 
+/* Klasse fuer die Stange */
 class Stange
 {
     constructor(pos,wert, farbe)
@@ -139,18 +190,18 @@ class Stange
         this.settings = JSON.parse(globalJson);
         this.kugelnProStange = this.settings['KugelnProStange'];
 
-        this.pos = pos;                 
-        this.wert = wert;               
+        this.pos = pos;     // Eigene position im Stangen-Array des Abakus.                     
+        this.wert = wert;   // Der Wert der Stange. bsp. 10^1, 10^2 etc.               
                                           
-        this.kugeln = new Array();      
-        for(var i = this.kugelnProStange; i >= 0; i--)
+        this.kugeln = new Array();    // Das Array fuer die Kugeln.  
+        for(var i = this.kugelnProStange; i >= 0; i--)  // Das Array mit Kugeln befuellen.
         {
             this.kugeln[i] = new Kugel(i,"id"+pos+"-"+i,this.wert,this, farbe);
         }
     }
 
-    //"gesammtWert()" gibt den Gesammtwert der Stange zurück, das heißt den Wert aller 
-    //Kugeln die nach rechts geschoben worden sind.
+    /*  gesammtWert() gibt den Gesammtwert der Stange zurück, das heißt den Wert aller 
+        Kugeln die nach rechts geschoben worden sind. */
     get  gesammtWert()
     {
         var wert = 0;
@@ -164,6 +215,10 @@ class Stange
         return wert;
     }
 
+    /*
+     * create() erstellt die Stange an Position X,Y und haengt diese im DOM ein.
+     * X und Y koennten auch direkt im constructor uebergeben werden.
+     */
     create(X,Y)
     {
         var kugelRadius = this.settings["KugelRadius"];
@@ -172,9 +227,21 @@ class Stange
         var rahmenThickness = this.settings["RahmenThickness"];
         var stangenThickness = this.settings["StangenThickness"];
         var stangenColor = this.settings["StangenColor"];
+        
+        /* Die laenge ergibt sich aus den Platz den alle Kugeln benoetigen mal zwei, 
+        *  da sich die Kugeln auch Platz zum verschieben brauchen.
+        */
         var stangenLength = 2 * (this.kugelnProStange * (kugelRadius + kugelSpacing));	
+        
+        /* Die Y-Position ergibt sich aus der Position im Array und den abstand der Stangen plus
+        *  den Radius der Kugel, damit mindestens immer Platz fuer die Kugeln ist.  
+        *  */
         var posY = Y + this.pos * (stangenSpacing + kugelRadius);
+        
+        // Auf die X-Position muss die Breite des Rahmens addiert werden.
         var posX = rahmenThickness + X;
+        
+        // Das div-Element erstellen.
         var stange = document.createElement("div");
         //Problematisch beim Warten des Codes, eventuell bessere Lösung überlegen.
         stange.style = "" +
@@ -185,6 +252,7 @@ class Stange
                     "height:" + stangenThickness + "px; " +
                     "top:" + posY + "px; " +
                     "left:" + posX + "px; ";
+        // Die Stange in das DOM einhaengen.
         document.body.appendChild(stange);
 
         //Kugeln drawn
@@ -196,22 +264,24 @@ class Stange
     }
 }
 
-ongoingTransitions = 0;
+
+
+/* Die Abakus klasse */
 class Abakus
 {
     constructor(x,y)
     {
-        //json parsen
-        var counter = 0;
-        var farbe = "#FF0000";	//Damit Kugeln in jedem Fall eine Farbe haben
         this.settings = JSON.parse(globalJson);
-
+        
         
         this.anzahlKugelnProStange = this.settings['KugelnProStange'];
         this.anzahlStangen = this.settings['Stangen'];
-        this.stangen = new Array();
+        this.stangen = new Array();     // Das Array das die Stangen haelt.
         this.value = 0;
-        for(var i = this.anzahlStangen -1; i >=0; i--)
+        
+        var farbe = "#FF0000";	// Damit Kugeln in jedem Fall eine Farbe haben
+        var exponent = 0;       // Der Exponent fuer die Wertigkeit der Stangen 10^1 10^2 etc.
+        for(var i = this.anzahlStangen -1; i >=0 ; i--)
         {
         	switch (i)
         	{
@@ -231,15 +301,15 @@ class Abakus
         			farbe = "#0000FF";
         			break;
         	}
-            this.stangen[i] = new Stange(i,Math.pow(10,counter), farbe);
-            counter++;
+            this.stangen[i] = new Stange(i,Math.pow(10,exponent), farbe);
+            exponent++;
         }
         
     }
 
 
-    //"gesammtWert()" gibt den Gesammtwert des Abakus zurück, das heißt den Wert aller 
-    //Gesammtwerte der Stangen.
+    // gesammtWert() gibt den Gesammtwert des Abakus zurück, das heißt den Wert aller 
+    // Gesammtwerte der Stangen.
     get gesammtWert()
     {
         var wert = 0;
@@ -250,11 +320,13 @@ class Abakus
         return  wert;
     }
 
+    // getter fuer stangen, haben wir nicht benutzt, da es keine Kapselung gibt, und es vergessen wurde.
     stange(pos)
     {
         return stangen[pos];
     }
 
+    // Kugel geht durch alle Stangen und sucht die Kugel die mit der ID ueberein stimmt.
     kugel(id)
     {
         for(var i = 0; i < this.anzahlStangen; i++)
@@ -270,7 +342,7 @@ class Abakus
         }
         return undefined;
     }
-
+    /* Erstellt den Abakus an Position X und Y */
     create(X,Y)
     {
     	//Anzeigetafel drawen
@@ -322,7 +394,9 @@ class Abakus
         "left:" + (2*this.settings['KugelnProStange'] * (this.settings["KugelRadius"] + this.settings["KugelSpacing"]) + X) + "px; "+
         "border-radius:" + 30 + "px; ";
     	document.body.appendChild(rechterRahmen);
-    	
+        
+        // Das transitionstart event existiert im Chrome nicht. Aus Kompatiblitaetsgruenden
+        // haben wir diese entfernt, und durch einen Work-Arround ersetzt.
        /* document.body.addEventListener("transitionstart", function()
         {
             ongoingTransitions++;
@@ -330,17 +404,15 @@ class Abakus
 
         });*/
 
+        
         document.body.addEventListener("transitionend", function()
         {
-        	ongoingTransitions--;
-            document.getElementById("send").disabled = false;
+        	ongoingTransitions--; // Wenn eine transition beendet wurde, wird ongoingTransitions angepasst.
+            document.getElementById("send").disabled = false; // Den Button reaktivieren.
             
         });
-        
-        
-    	
-    	
-        //Stangen drawen
+        	
+        //Stangen erstellen.
         for(var i = 0; i < this.anzahlStangen; i++)
         {
             this.stangen[i].create(X,Y);
@@ -364,8 +436,9 @@ class Abakus
         "position: absolute; " +
         "top: " + (Y + 315) + "px;" +
         "left: " + (X + 45) + "px";
-    	
-        textBox.addEventListener("keyup",valid)
+        
+        
+        textBox.addEventListener("keyup",valid) // Keyup event fuer die Validierung des Inputs
         document.body.appendChild(textBox);
         
         //Für die Fehlermeldung bei ungültiger Eingabe
@@ -390,36 +463,39 @@ class Abakus
         {	
         	if (valid() === true)
         	{
-	            var input = document.getElementById("wertEingabe").value;
-	            input = parseInt(input.replace(/\s/g,''));
-	            /*Für jede stelle x mal flippen*/ 
-	            
+	            var input = document.getElementById("wertEingabe").value;  
+                input = parseInt(input.replace(/\s/g,'')); // Whitespaces mit '' ersetzen.
 	            if (input > 0)
 	            {
 	            	addieren(input);
 				}
 	            if (input < 0) 
 	            {
-	            	input = input * (-1);
+	            	input = input * (-1); // Input wieder positiv drehen
 	            	subtrahieren(input);
 				}
-	            document.getElementById("wertEingabe").value = "";  
+	            document.getElementById("wertEingabe").value = "";  // Die Eingabe zurueck setzen.
 	            
         	}
         });
-        document.body.appendChild(button);
+        document.body.appendChild(button);  // Den Button einhaengen.
     }
 }
 
-var abakus = new Abakus();
 
+/* valid() validiert den input, und gibt true zurueck wenn der Input valide ist. */
 function valid()
 {
+    // Den Wert aus der WertAnzeige holen.
 	var currentValue = parseInt(document.getElementById("wertAnzeige").innerText);
+    // Den input holen.
     var input = document.getElementById("wertEingabe").value;
+    // Whitespaces ignorieren.
     input = parseInt(input.replace(/\s/g,''));
+    // Das Ergebnis darf nicht kleiner 0 oder groeßer 99999 sein.
     if (currentValue + input < 0 || currentValue + input > 99999) 
     {
+        // Das Absenden verhindern.
     	document.getElementById("send").disabled = true;
     	document.getElementById("errorMessage").innerHTML = "Der aktuelle Wert des Abakus' darf durch die Addition der "
     											+"eingegebenen Zahl nicht über 99999 oder unter 0 fallen.";
@@ -427,21 +503,26 @@ function valid()
 	}
     else 
     {
+         // Das Absenden verhindern.
     	document.getElementById("send").disabled = false;
     	document.getElementById("errorMessage").innerHTML = "";
     	return true;
     }
 }
 
+/* Adiert den input auf den aktuellen Wert. */
 function addieren(input)
 {
-	var counter = (""+input).length;
+    var counter = (""+input).length;    // Die laenge des inputs zum iterieren.
+    
+    // Ueber alle Stangen iterieren die durch die Addition beeinflusst werden.
 	for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
     {
         var currentStange = abakus.stangen[i];
-        var currentZahl = (""+input)[counter];
-        counter--;
+        var currentZahl = (""+input)[counter];  // Eine stelle der Inputzahl
+        counter--;                              // Den counter auf die naechste Stelle schieben.
         
+        // Fuer die aktuelle Stelle passend viele Kugeln verschieben.
         for(let j = 1; j <= currentZahl; j++)
         {
         	/*Flippe immer die letzte nicht geflippte Kugel */
@@ -450,7 +531,7 @@ function addieren(input)
                 if(!currentStange.kugeln[x].flippedRight)
                 {
                 	currentStange.kugeln[x].flip();
-                	x = -1;	
+                	x = -1;	// Die Schleife beenden.
                 }
             }
         }
@@ -546,6 +627,9 @@ function moveKugel(id)
   //  var anzeige = document.getElementById("wertAnzeige");
 	kugel.flip();	 
 }
+
+ // Der Abakus
+ var abakus = new Abakus();
 
 function main()
 {
