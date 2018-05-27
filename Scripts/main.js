@@ -443,44 +443,54 @@ function addieren(input)
         
         for(let j = 1; j <= currentZahl; j++)
         {
-        	alert("test");
-        		/*Flippe immer die letzte nicht geflippte Kugel */
-                for(var x = abakus.anzahlKugelnProStange - 1; x >= 0; x--)
+        	/*Flippe immer die letzte nicht geflippte Kugel */
+            for(var x = abakus.anzahlKugelnProStange - 1; x >= 0; x--)
+            {
+                if(!currentStange.kugeln[x].flippedRight)
                 {
-                    if(!currentStange.kugeln[x].flippedRight)
-                    {
-                    	currentStange.kugeln[x].flip();
-                    	x = -1;	
-                    }
+                	currentStange.kugeln[x].flip();
+                	x = -1;	
                 }
+            }
         }
     }
 }
 
 function subtrahieren(input)
 {
-	var counter = (""+input).length;
-	for(let i = abakus.anzahlStangen; i > abakus.anzahlStangen - (""+input).length -1; i--)
+    var inputLength = (""+input).length;
+    var ergebnis = abakus.gesammtWert - input;
+    var ergebnisLength = (""+ergebnis).length;
+
+    /*for(let i = 0; i <= (inputLength - ergebnisLength) + 1; i++)
     {
-        var currentStange = abakus.stangen[i];
-        var currentZahl = (""+input)[counter];
-        counter--;
-    	
-        for(let j = 0; j < currentZahl; j++)
+        let currentKugel = abakus.stangen[i].kugeln[abakus.anzahlKugelnProStange - 1];
+        if(currentKugel.flippedRight)
+            currentKugel.flip(); 
+    }
+    */
+    
+    /*Ergebnis-string mit Nullen auffüllen */
+    for(let i = 0; i < abakus.anzahlStangen - ergebnisLength; i++)
+        ergebnis = "0" + ergebnis;
+
+    for(let i = 0; i < abakus.anzahlStangen; i++)
+    {
+        let currentStange = abakus.stangen[i];
+        let kugel = currentStange.kugeln[(abakus.anzahlKugelnProStange - 1) - ergebnis[i]];
+        if(kugel.flippedRight && egebnis[i] === 0)
+            kugel.flip();
+        else
         {
-        	//alert("test");
-        		//Flippe immer die erste geflippte zahl 
-                for(let x = 1; x <= abakus.anzahlKugelnProStange - 1; x++)
-                {
-                		 if(currentStange.kugeln[x].flippedRight)
-                            {
-                                currentStange.kugeln[x].flip();
-                                x = abakus.anzahlKugelnProStange +1;
-                            }
-                }
-            
+            kugel.flip();
         }
     }
+
+    console.log(ergebnis);
+    console.log(abakus.gesammtWert);
+
+   
+
 }
 
 function overFlow(kugel)
