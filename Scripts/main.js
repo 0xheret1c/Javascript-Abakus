@@ -556,6 +556,7 @@ function subtrahieren(input)
     	let currentStange = abakus.stangen[i];
     	if (ergebnis[i] == 0)
     	{
+    		//Flippt die Reihe nach links, wenn der anzuzeigende Wert 0 sein soll
 			if (currentStange.kugeln[array[ergebnis[i]]].flippedRight)
 			{
 				currentStange.kugeln[array[ergebnis[i]]].flip();
@@ -563,19 +564,23 @@ function subtrahieren(input)
 		}
     	else
     	{
+    		//Flippt die jeweilige Kugel, welche im Array steht um den anzuzeigenden Wert darzustellen
     		if (!currentStange.kugeln[array[ergebnis[i]]].flippedRight)
     		{
     			currentStange.kugeln[array[ergebnis[i]]].flip();
 			}
     		
-    		if (parseInt(ergebnis[i])+1 > array.length)
+    		//Diese Bedingung wird nie eintreffen...
+    		/*if (parseInt(ergebnis[i])+1 > array.length)
     		{
     			if (!currentStange.kugeln[array[parseInt(ergebnis[i])+1]].flippedRight)
         		{
     				currentStange.kugeln[array[1]].flip();
     			}
 			}
-    		else if (parseInt(ergebnis[i])+1 < array.length)
+    		else*/
+    		//Flipt noch alle Kugeln, welche Links von der einzustellenden Zahl sind & rechtsgeflippt sind, nach links
+    		if (parseInt(ergebnis[i])+1 < array.length)
     		{
     			if (currentStange.kugeln[array[parseInt(ergebnis[i])+1]].flippedRight)
         		{
@@ -607,7 +612,6 @@ function overFlow(kugel)
     if(_kugel.stange.pos == 0)
         return
 
-
     var naechsteStange = abakus.stangen[_kugel.stange.pos - 1];
     
     for(let i = kugelnProStange -1; i >= 0; i--)
@@ -624,7 +628,6 @@ function moveKugel(id)
 {
 	var HTMLkugel = document.getElementById(id);
     var kugel = abakus.kugel(HTMLkugel.id);
-  //  var anzeige = document.getElementById("wertAnzeige");
 	kugel.flip();	 
 }
 
